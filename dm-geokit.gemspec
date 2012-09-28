@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
      "lib/dm-geokit/support/float.rb",
      "lib/dm-geokit/support/integer.rb",
      "lib/dm-geokit/support/symbol.rb",
-     "lib/jeweler/templates/.gitignore",
+     "lib/dm-geokit/support/dirty_hacks.rb",
      "lib/skeleton/api_keys_template"
   ]
   s.has_rdoc = true

@@ -21,7 +21,12 @@ module DataMapper
             repository.adapter.class.module_eval do
               alias_method :orig_quote_name, :quote_name
               def quote_name(name)
-                name.include?('(') ? name : orig_quote_name(name)
+                return orig_quote_name(name)
+                if name.respond_to?(:raw?) && name.raw?
+                  name
+                else
+                  orig_quote_name(name)
+                end
               end
             end
           end
@@ -113,9 +118,9 @@ module DataMapper
               field = k.target
               origin = v[:origin].is_a?(String) ? ::GeoKit::Geocoders::MultiGeocoder.geocode(v[:origin]) : v[:origin]
               distance = v[:distance]
-              query[:conditions] = expand_conditions(query[:conditions], "#{sphere_distance_sql(field, origin, distance.measurement)}", distance.to_f)
+              query[:conditions] = expand_conditions(query[:conditions], sphere_distance_sql(field, origin, distance.measurement), distance.to_f)
               query[:conditions] = apply_bounds_conditions(query[:conditions], field, bounds_from_distance(distance.to_f, origin, distance.measurement))
-              query[:fields] = expand_fields(query[:fields], field, "#{sphere_distance_sql(field, origin, distance.measurement)}")
+              query[:fields] = expand_fields(query[:fields], field, sphere_distance_sql(field, origin, distance.measurement))
               query.delete(k)
             end
           rescue NoMethodError
@@ -129,7 +134,9 @@ module DataMapper
           lat = deg2rad(origin.lat)
           lng = deg2rad(origin.lng)
           qualified_lat_column, qualified_lng_column = qualified_geo_column_pair(storage_name, field)
-          "(ACOS(least(1,COS(#{lat})*COS(#{lng})*COS(RADIANS(#{qualified_lat_column}))*COS(RADIANS(#{qualified_lng_column}))+COS(#{lat})*SIN(#{lng})*COS(RADIANS(#{qualified_lat_column}))*SIN(RADIANS(#{qualified_lng_column}))+SIN(#{lat})*SIN(RADIANS(#{qualified_lat_column}))))*#{units_sphere_multiplier(units)})"
+          ret = "(ACOS(least(1,COS(#{lat})*COS(#{lng})*COS(RADIANS(#{qualified_lat_column}))*COS(RADIANS(#{qualified_lng_column}))+COS(#{lat})*SIN(#{lng})*COS(RADIANS(#{qualified_lat_column}))*SIN(RADIANS(#{qualified_lng_column}))+SIN(#{lat})*SIN(RADIANS(#{qualified_lat_column}))))*#{units_sphere_multiplier(units)})"
+          ret.instance_eval { def raw?; true; end }
+          ret
         end
 
         # in case conditions were altered by other means

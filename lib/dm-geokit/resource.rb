@@ -21,7 +21,7 @@ module DataMapper
             repository.adapter.class.module_eval do
               alias_method :orig_quote_name, :quote_name
               def quote_name(name)
-                if name.respond_to?(:raw?) && name.raw?
+                if (name.respond_to?(:raw?) && name.raw?) || name.match(/^\(/)
                   name
                 else
                   orig_quote_name(name)

@@ -15,16 +15,20 @@ class DataMapper::Query
     end
 
     fields.each do |field|
-      name = case field
-               when Symbol, String
-                 field
-               when DataMapper::Property
-                 field.name
-               else
-                 raise ArgumentError, "+options[:fields]+ entry #{field.inspect} of an unsupported object #{field.class}"
-             end
-      unless valid_properties.named?(name)
-        raise ArgumentError, "+options[:fields]+ entry #{name.inspect} does not map to a property in #{model}"
+      case field
+        when Symbol, String
+          unless valid_properties.named?(field)
+            raise ArgumentError, "+options[:fields]+ entry #{field.inspect} does not map to a property in #{model}"
+          end
+
+        when DataMapper::Property
+          unless valid_properties.include?(field) || valid_properties.named?(field.name)
+            raise ArgumentError, "+options[:field]+ entry #{field.name.inspect} does not map to a property in #{model}"
+          end
+        when DataMapper::Query::Operator
+          # Do nothing
+        else
+          raise ArgumentError, "+options[:fields]+ entry #{field.inspect} of an unsupported object #{field.class}"
       end
     end
   end

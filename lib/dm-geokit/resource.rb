@@ -60,11 +60,7 @@ module DataMapper
         end
 
         define_method "#{name}" do
-          if attribute_get(name.to_sym).nil?
-            nil
-          else
-            GeographicLocation.new(name, self)
-          end
+          GeographicLocation.new(name, self)
         end
 
         define_method "#{name}=" do |value|
@@ -92,7 +88,7 @@ module DataMapper
       def self.included(base) # :nodoc:
         base.extend SingletonMethods
       end
-      
+
       module SingletonMethods # :nodoc:
         def all(query = {})
           super(prepare_query(query))
@@ -170,7 +166,7 @@ module DataMapper
         def bounds_from_distance(distance, origin, units)
           if distance
             ::GeoKit::Bounds.from_point_and_radius(origin,distance,:units=>units)
-          else 
+          else
             nil
           end
         end
@@ -252,7 +248,7 @@ module DataMapper
 
   class Property
     class Distance < Float
-      
+
     end
   end
 

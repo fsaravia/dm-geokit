@@ -50,7 +50,7 @@ describe "dm-geokit" do
 
   it "should set address fields on geocode" do
     l = Location.new
-    l.address.should be(nil)
+    l.address.full_address.should be(nil)
     DataMapper::GeoKit::PROPERTY_NAMES.each do |p|
       l.send("address_#{p}").should be(nil)
     end

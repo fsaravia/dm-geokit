@@ -43,7 +43,9 @@ module DataMapper
 
         PROPERTY_NAMES.each do |p|
           if p.match(/l(at|ng)/)
-            property "#{name}_#{p}".to_sym, Float, :precision => 15, :scale => 12, :index => true
+            property_options = {:precision => 15, :scale => 12, :index => true}
+            property_options[:auto_validation] = false if defined?(DataMapper::Validations)
+            property "#{name}_#{p}".to_sym, Float, property_options
           else
             property "#{name}_#{p}".to_sym, String, :length => 255
           end

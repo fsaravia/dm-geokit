@@ -4,7 +4,7 @@ $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 
 #DataMapper::Logger.new(STDOUT, :debug)
 DataMapper.setup(:default, "mysql://root@localhost/dm_geokit_test")
-GeoKit::Geocoders::google = 'ABQIAAAAdh4tQvHsPhXZm0lCnIiqQxQK9-uvPXgtXTy8QpRnjVVz0_XBmRQRzegmnZqycC7ewqw26GJSVik0_w'
+Geokit::Geocoders::provider_order = [:google3]
 class Location
   include DataMapper::Resource
   include DataMapper::GeoKit

@@ -72,14 +72,20 @@ module DataMapper
             if auto_geocode?
               geo = ::GeoKit::Geocoders::MultiGeocoder.geocode(value)
               if geo.success?
-                attribute_set(name.to_sym, geo.full_address)
-                PROPERTY_NAMES.each do |p|
-                  attribute_set("#{name}_#{p}".to_sym, geo.send(p.to_sym))
-                end
+                assign_geoloc(geo)
               end
             else
               attribute_set(name.to_sym, value)
             end
+          elsif value.is_a?(Geokit::GeoLoc)
+            assign_geoloc(value)
+          end
+        end
+
+        define_method :assign_geoloc do |geo|
+          attribute_set(name.to_sym, geo.full_address)
+          PROPERTY_NAMES.each do |p|
+            attribute_set("#{name}_#{p}".to_sym, geo.send(p.to_sym))
           end
         end
       end

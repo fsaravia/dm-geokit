@@ -216,10 +216,19 @@ module DataMapper
         @distance = obj.send("#{field}_distance") if obj.respond_to?("#{field}_distance".to_sym)
       end
       def to_s
-        @full_address
+        @full_address ? @full_address : to_geocodeable_s
       end
       def to_lat_lng
         ::GeoKit::LatLng.new(@lat,@lng)
+      end
+
+      # Returns a comma-delimited string consisting of the street address, city, state,
+      # zip, and country code.  Only includes those attributes that are non-blank.
+      # Copied from https://github.com/geokit/geokit/blob/master/lib/geokit/mappable.rb#L445
+      def to_geocodeable_s
+        a=[street_address, city, state, zip, country_code].compact
+        a.delete_if { |e| !e || e == '' }
+        a.join(', ')
       end
     end
 

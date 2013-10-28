@@ -77,15 +77,15 @@ module DataMapper
             else
               attribute_set(name.to_sym, value)
             end
-          elsif value.is_a?(Geokit::GeoLoc)
+          else
             assign_geoloc(value)
           end
         end
 
         define_method :assign_geoloc do |geo|
-          attribute_set(name.to_sym, geo.full_address)
+          attribute_set(name.to_sym, geo.full_address) if geo.respond_to?(:full_address)
           PROPERTY_NAMES.each do |p|
-            attribute_set("#{name}_#{p}".to_sym, geo.send(p.to_sym))
+            attribute_set("#{name}_#{p}".to_sym, geo.send(p.to_sym)) if geo.respond_to?(p.to_sym)
           end
         end
       end

@@ -36,7 +36,7 @@ describe "dm-geokit" do
   end
 
   it "should have a geocode method" do
-    Location.should respond_to(:geocode)    
+    Location.should respond_to(:geocode)
   end
 
   it "should have the address field return a GeographicLocation object" do
@@ -57,6 +57,17 @@ describe "dm-geokit" do
     l.address = '5119 NE 27th ave portland, or 97211'
     DataMapper::GeoKit::PROPERTY_NAMES.each do |p|
       l.send("address_#{p}").should_not be(nil)
+    end
+  end
+
+  it 'should set address fields when receiving a geocode object' do
+    geo = Geokit::Geocoders::MultiGeocoder.geocode('5119 NE 27th ave portland, or 97211')
+    geo.should be_a(Geokit::GeoLoc)
+    l = Location.new
+    l.address.full_address.should be(nil)
+    l.address = geo
+    DataMapper::GeoKit::PROPERTY_NAMES.each do |p|
+      l.send("address_#{p}".to_sym).should eq geo.send(p.to_sym)
     end
   end
 
